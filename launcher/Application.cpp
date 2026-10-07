@@ -886,6 +886,14 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
 
         m_settings->registerSetting("PineconeAutoServers", true);
 
+        // MineStrator API налаштування
+        // ВАЖЛИВО: API-ключ зберігається в захищених налаштуваннях ОС або в конфіг-файлі з обмеженим доступом.
+        // MinestratorApiKey — НІКОЛИ не встановлюється з коду, тільки через UI налаштувань.
+        m_settings->registerSetting("MinestratorApiKey", "");       // API-ключ (зі сторінки Compte → Clés API)
+        m_settings->registerSetting("MinestratorServerId", "");     // ID сервера (з URL панелі MineStrator)
+        m_settings->registerSetting("MinestratorServerAddress", ""); // Збережена адреса сервера
+        m_settings->registerSetting("DirectJoinServerAddress", ""); // Адреса для прямого входу
+
         m_settings->registerSetting("MetaRefreshOnLaunch", true);
         m_settings->registerSetting("CloseAfterLaunch", false);
         m_settings->registerSetting("QuitAfterGameStop", false);

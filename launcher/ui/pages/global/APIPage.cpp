@@ -210,6 +210,11 @@ void APIPage::loadSettings()
     ui->technicClientID->setText(s->get("TechnicClientID").toString());
 
     ui->autoServersCheckBox->setChecked(s->get("PineconeAutoServers").toBool());
+
+    // MineStrator API налаштування
+    // API-ключ НІКОЛИ не логується — поле встановлене в режим Password в UI
+    ui->minestratorApiKey->setText(s->get("MinestratorApiKey").toString());
+    ui->minestratorServerId->setText(s->get("MinestratorServerId").toString());
 }
 
 void APIPage::applySettings()
@@ -263,6 +268,9 @@ void APIPage::applySettings()
     s->set("TechnicClientID", ui->technicClientID->text());
 
     s->set("PineconeAutoServers", ui->autoServersCheckBox->isChecked());
+
+    s->set("MinestratorApiKey", ui->minestratorApiKey->text().trimmed());
+    s->set("MinestratorServerId", ui->minestratorServerId->text().trimmed());
 }
 
 bool APIPage::apply()

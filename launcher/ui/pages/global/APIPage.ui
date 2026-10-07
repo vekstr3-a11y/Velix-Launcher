@@ -140,6 +140,58 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="groupBox_minestrator">
+         <property name="title">
+          <string>MineStrator API</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_minestrator">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_minestratorApiKey">
+            <property name="text">
+             <string>API-ключ:</string>
+            </property>
+            <property name="toolTip">
+             <string>API-ключ з вашого акаунту MineStrator (Compte → Clés API). Зберігається локально.</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="minestratorApiKey">
+            <property name="placeholderText">
+             <string>Вставте API-ключ MineStrator (Compte → Clés API)</string>
+            </property>
+            <property name="echoMode">
+             <enum>QLineEdit::EchoMode::Password</enum>
+            </property>
+            <property name="toolTip">
+             <string>Ваш API-ключ MineStrator. Знайдіть його у панелі: Compte → Clés API.</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_minestratorServerId">
+            <property name="text">
+             <string>ID сервера:</string>
+            </property>
+            <property name="toolTip">
+             <string>Короткий ідентифікатор вашого сервера MineStrator (наприклад: a0782234). Знайдіть у URL сторінки сервера в панелі.</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="minestratorServerId">
+            <property name="placeholderText">
+             <string>ID сервера (наприклад: a0782234)</string>
+            </property>
+            <property name="toolTip">
+             <string>Короткий ідентифікатор сервера зі URL панелі MineStrator.</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="groupBox_paste">
          <property name="title">
           <string>&amp;Pastebin Service</string>

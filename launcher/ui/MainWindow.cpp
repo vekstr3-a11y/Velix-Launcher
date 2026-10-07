@@ -68,6 +68,7 @@
 #include <QProgressDialog>
 #include <QShortcut>
 #include <QStatusBar>
+#include <QTimer>
 #include <QToolBar>
 #include <QToolButton>
 #include <QWidget>
@@ -84,6 +85,7 @@
 #include <java/JavaUtils.h>
 #include <launch/LaunchTask.h>
 #include <minecraft/MinecraftInstance.h>
+#include <minecraft/launch/MinecraftTarget.h>
 #include <minecraft/auth/AccountList.h>
 #include <net/ApiDownload.h>
 #include <net/NetJob.h>
@@ -102,6 +104,8 @@
 #include "ui/dialogs/ExportPackDialog.h"
 #include "ui/dialogs/IconPickerDialog.h"
 #include "ui/dialogs/ImportResourceDialog.h"
+#include "ui/dialogs/LaunchOptionsDialog.h"
+#include "minestrator/MinestratorAPI.h"
 #include "ui/dialogs/NewInstanceDialog.h"
 #include "ui/dialogs/NewsDialog.h"
 #include "ui/dialogs/ProgressDialog.h"
@@ -1612,14 +1616,117 @@ void MainWindow::instanceActivated(QModelIndex index)
 
 void MainWindow::on_actionLaunchInstance_triggered()
 {
-    if (m_selectedInstance && !m_selectedInstance->isRunning()) {
-        APPLICATION->launch(m_selectedInstance);
+    startInstanceFromLaunchOptions(m_selectedInstance);
+}
+
+void MainWindow::startInstanceFromLaunchOptions(BaseInstance* instance)
+{
+    if (!instance || instance->isRunning())
+        return;
+
+    LaunchOptionsDialog dialog(APPLICATION->settings()->get("MinestratorServerAddress").toString(),
+                               APPLICATION->settings()->get("DirectJoinServerAddress").toString(), this);
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+
+    const auto choice = dialog.choice();
+
+    // ── Режим 2: ЗАПУСТИТИ MINECRAFT ─────────────────────────────────────────
+    // Тільки запуск Minecraft, без MineStrator API і без сервера
+    if (choice == LaunchOptionsDialog::Choice::Minecraft) {
+        APPLICATION->launch(instance);
+        return;
+    }
+
+    const QString address = dialog.serverAddress();
+
+    // ── Режим 1: ЗАПУСК СВОГО СЕРВЕРА ────────────────────────────────────────
+    // Паралельно: (A) команда запуску MineStrator API + (B) запуск Minecraft
+    if (choice == LaunchOptionsDialog::Choice::Minestrator) {
+        APPLICATION->settings()->set("MinestratorServerAddress", address);
+
+        // Зчитуємо API-ключ та ID сервера з налаштувань (НІКОЛИ не з коду)
+        const QString apiKey    = APPLICATION->settings()->get("MinestratorApiKey").toString();
+        const QString serverId  = APPLICATION->settings()->get("MinestratorServerId").toString();
+
+        // (A) Паралельна команда запуску сервера через MineStrator API
+        // Використовуємо офіційний endpoint: PUT /server/{id}/poweraction
+        // Ця операція НЕ блокує UI і НЕ блокує запуск Minecraft
+        if (!apiKey.isEmpty() && !serverId.isEmpty()) {
+            auto* api = new MineStratorAPI(apiKey, serverId, this);
+
+            statusBar()->showMessage(tr("MineStrator: перевірка статусу сервера..."), 4000);
+
+            // Таймер безпеки — припинити опитування через 3 хвилини, щоб не висіти нескінченно
+            auto* timeoutTimer = new QTimer(api);
+            timeoutTimer->setSingleShot(true);
+            connect(timeoutTimer, &QTimer::timeout, api, [this, api]() {
+                api->stopStatusPolling();
+                statusBar()->showMessage(tr("MineStrator: час очікування готовності сервера вичерпано."), 6000);
+                api->deleteLater();
+            });
+
+            // Обробка статусу сервера
+            connect(api, &MineStratorAPI::serverStatusChecked, this,
+                [this, api, timeoutTimer](MineStratorAPI::ServerState state, const QString& error) {
+                    if (state == MineStratorAPI::ServerState::Online) {
+                        statusBar()->showMessage(tr("MineStrator: Сервер онлайн ✓"), 6000);
+                        api->stopStatusPolling();
+                        api->deleteLater();
+                    } else if (state == MineStratorAPI::ServerState::Starting) {
+                        statusBar()->showMessage(tr("MineStrator: Сервер запускається..."), 4000);
+                    } else if (state == MineStratorAPI::ServerState::Offline) {
+                        // Якщо сервер офлайн і ми ще не надсилали команду — надсилаємо команду запуску
+                        statusBar()->showMessage(tr("MineStrator: Запуск сервера..."), 4000);
+                        api->startServer();
+                    } else if (state == MineStratorAPI::ServerState::Error && !error.isEmpty()) {
+                        statusBar()->showMessage(tr("MineStrator: %1").arg(error), 6000);
+                    }
+                });
+
+            // Результат відправки команди запуску
+            connect(api, &MineStratorAPI::startServerFinished, this,
+                [this, api, timeoutTimer](bool success, const QString& errorMessage) {
+                    if (success) {
+                        statusBar()->showMessage(tr("MineStrator: Сервер запускається..."), 5000);
+                        // Починаємо циклічне опитування статусу раз на 4 секунди
+                        api->startStatusPolling(4000);
+                        timeoutTimer->start(180000);  // 3 хвилини ліміт
+                    } else {
+                        statusBar()->showMessage(tr("MineStrator: %1").arg(errorMessage), 8000);
+                        api->deleteLater();
+                    }
+                });
+
+            // Запускаємо першу перевірку асинхронно
+            api->checkServerStatus();
+        } else {
+            // Немає облікових даних — показуємо підказку
+            statusBar()->showMessage(
+                tr("MineStrator API: введіть API-ключ та ID сервера в налаштуваннях Velix Launcher."), 8000);
+        }
+
+        // (B) Запускаємо Minecraft ОДРАЗУ, незалежно від результату API
+        // Minecraft запускається паралельно із запитом до MineStrator
+        APPLICATION->launch(instance, LaunchMode::Normal,
+                            std::make_shared<MinecraftTarget>(MinecraftTarget::parse(address, false)));
+        return;
+    }
+
+    // ── Режим 3: ЗАЙТИ НА СЕРВЕР ─────────────────────────────────────────────
+    // Minecraft + автопідключення до довільного IP (MineStrator API не використовується)
+    if (choice == LaunchOptionsDialog::Choice::Server) {
+        APPLICATION->settings()->set("DirectJoinServerAddress", address);
+        APPLICATION->launch(instance, LaunchMode::Normal,
+                            std::make_shared<MinecraftTarget>(MinecraftTarget::parse(address, false)));
+        return;
     }
 }
 
+
 void MainWindow::activateInstance(BaseInstance* instance)
 {
-    APPLICATION->launch(instance);
+    startInstanceFromLaunchOptions(instance);
 }
 
 void MainWindow::on_actionKillInstance_triggered()

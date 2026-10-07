@@ -149,6 +149,8 @@ set(NET_SOURCES
 
     PineconeNetworkCheck.cpp
     PineconeNetworkCheck.h
+    minestrator/MinestratorAPI.cpp
+    minestrator/MinestratorAPI.h
     net/flame/FetchFlameAPIKey.cpp
     net/flame/FetchFlameAPIKey.h
 )
@@ -1082,6 +1084,8 @@ SET(LAUNCHER_SOURCES
     ui/dialogs/IconPickerDialog.h
     ui/dialogs/ImportResourceDialog.cpp
     ui/dialogs/ImportResourceDialog.h
+    ui/dialogs/LaunchOptionsDialog.cpp
+    ui/dialogs/LaunchOptionsDialog.h
     ui/dialogs/MSALoginDialog.cpp
     ui/dialogs/MSALoginDialog.h
     ui/dialogs/ElyLoginDialog.cpp

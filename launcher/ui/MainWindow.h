@@ -223,6 +223,7 @@ class MainWindow : public QMainWindow {
 
     void addInstance(const QString& url = QString(), const QMap<QString, QString>& extra_info = {});
     void activateInstance(BaseInstance* instance);
+    void startInstanceFromLaunchOptions(BaseInstance* instance);
     void setCatBackground(bool enabled);
     void updateInstanceToolIcon(QString new_icon);
     void setSelectedInstanceById(const QString& id);
