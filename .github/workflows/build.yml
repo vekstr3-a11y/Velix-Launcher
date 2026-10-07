@@ -9,6 +9,7 @@ on:
     branches:
       - "develop"
       - "release-*"
+      - "main"
     paths:
       # File types
       - "**.cpp"
