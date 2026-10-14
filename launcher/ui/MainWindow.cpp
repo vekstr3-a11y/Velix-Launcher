@@ -1655,9 +1655,9 @@ void MainWindow::startInstanceFromLaunchOptions(BaseInstance* instance)
         if (!apiKey.isEmpty() && !serverId.isEmpty()) {
             auto* api = new MineStratorAPI(apiKey, serverId, this);
 
-            statusBar()->showMessage(tr("MineStrator: перевірка статусу сервера..."), 4000);
+            statusBar()->showMessage(tr("MineStrator: надсилання команди запуску сервера..."), 5000);
 
-            // Таймер безпеки — припинити опитування через 3 хвилини, щоб не висіти нескінченно
+            // Таймер безпеки — припинити опитування через 3 хвилини
             auto* timeoutTimer = new QTimer(api);
             timeoutTimer->setSingleShot(true);
             connect(timeoutTimer, &QTimer::timeout, api, [this, api]() {
@@ -1666,7 +1666,21 @@ void MainWindow::startInstanceFromLaunchOptions(BaseInstance* instance)
                 api->deleteLater();
             });
 
-            // Обробка статусу сервера
+            // Результат відправки команди запуску
+            connect(api, &MineStratorAPI::startServerFinished, this,
+                [this, api, timeoutTimer](bool success, const QString& errorMessage) {
+                    if (success) {
+                        statusBar()->showMessage(tr("MineStrator: Команда запуску надіслана. Очікування готовності..."), 5000);
+                        // Починаємо циклічне опитування статусу раз на 4 секунди
+                        api->startStatusPolling(4000);
+                        timeoutTimer->start(180000);  // 3 хвилини ліміт
+                    } else {
+                        statusBar()->showMessage(tr("MineStrator помилка: %1").arg(errorMessage), 8000);
+                        api->deleteLater();
+                    }
+                });
+
+            // Обробка статусу сервера під час опитування
             connect(api, &MineStratorAPI::serverStatusChecked, this,
                 [this, api, timeoutTimer](MineStratorAPI::ServerState state, const QString& error) {
                     if (state == MineStratorAPI::ServerState::Online) {
@@ -1674,32 +1688,14 @@ void MainWindow::startInstanceFromLaunchOptions(BaseInstance* instance)
                         api->stopStatusPolling();
                         api->deleteLater();
                     } else if (state == MineStratorAPI::ServerState::Starting) {
-                        statusBar()->showMessage(tr("MineStrator: Сервер запускається..."), 4000);
-                    } else if (state == MineStratorAPI::ServerState::Offline) {
-                        // Якщо сервер офлайн і ми ще не надсилали команду — надсилаємо команду запуску
-                        statusBar()->showMessage(tr("MineStrator: Запуск сервера..."), 4000);
-                        api->startServer();
+                        statusBar()->showMessage(tr("MineStrator: Сервер запускається..."), 3000);
                     } else if (state == MineStratorAPI::ServerState::Error && !error.isEmpty()) {
-                        statusBar()->showMessage(tr("MineStrator: %1").arg(error), 6000);
+                        statusBar()->showMessage(tr("MineStrator: %1").arg(error), 5000);
                     }
                 });
 
-            // Результат відправки команди запуску
-            connect(api, &MineStratorAPI::startServerFinished, this,
-                [this, api, timeoutTimer](bool success, const QString& errorMessage) {
-                    if (success) {
-                        statusBar()->showMessage(tr("MineStrator: Сервер запускається..."), 5000);
-                        // Починаємо циклічне опитування статусу раз на 4 секунди
-                        api->startStatusPolling(4000);
-                        timeoutTimer->start(180000);  // 3 хвилини ліміт
-                    } else {
-                        statusBar()->showMessage(tr("MineStrator: %1").arg(errorMessage), 8000);
-                        api->deleteLater();
-                    }
-                });
-
-            // Запускаємо першу перевірку асинхронно
-            api->checkServerStatus();
+            // ВАЖЛИВО: Відправляємо команду запуску сервера ОДРАЗУ (0 секунд)!
+            api->startServer();
         } else {
             // Немає облікових даних — показуємо підказку
             statusBar()->showMessage(

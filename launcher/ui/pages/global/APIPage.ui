@@ -41,7 +41,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox_pinecone">
          <property name="title">
-          <string>PineconeMC</string>
+          <string>Velix Core</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_9">
           <item>

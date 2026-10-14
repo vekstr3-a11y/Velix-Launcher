@@ -33,6 +33,8 @@ class QStackedWidget;
  *   1. ЗАПУСК СВОГО СЕРВЕРА  — запускає MineStrator сервер + Minecraft паралельно
  *   2. ЗАПУСТИТИ MINECRAFT    — тільки Minecraft, без сервера
  *   3. ЗАЙТИ НА СЕРВЕР       — Minecraft + автопідключення до довільного IP
+ *
+ * Підтримує теми оформлення та мультимовний переклад (uk, en, ru, de, pl тощо).
  */
 class LaunchOptionsDialog final : public QDialog {
     Q_OBJECT
@@ -58,10 +60,13 @@ class LaunchOptionsDialog final : public QDialog {
     void showPage(int index);
     void acceptAddress(Choice choice, QLineEdit* addressField);
     void updateStatusLabel(const QString& text, bool isError = false);
+    static QString trLoc(const QString& key);
 
     Choice m_choice = Choice::None;
     QStackedWidget* m_pages = nullptr;
-    QLineEdit* m_minestratorAddress = nullptr;  ///< Поле адреси для MineStrator
+    QLineEdit* m_minestratorAddress = nullptr;   ///< Поле адреси для MineStrator
+    QLineEdit* m_minestratorApiKey = nullptr;    ///< Поле API-ключа MineStrator
+    QLineEdit* m_minestratorServerId = nullptr;  ///< Поле ID сервера MineStrator
     QLineEdit* m_serverAddress = nullptr;        ///< Поле адреси для прямого підключення
     QLabel* m_minestratorStatusLabel = nullptr;  ///< Лейбл статусу MineStrator сервера
 };

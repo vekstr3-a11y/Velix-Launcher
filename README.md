@@ -1,76 +1,69 @@
-> [!CAUTION]
-> **There's now malicious links in the wild that disguise themselves as this project.**
->
-> Make sure that you download PineconeMC from `elyprismlauncher.github.io` and/or `pineconemc.ru`.
+<p align="center">
+  <img alt="Velix Launcher" src="/program_info/org.velix.VelixLauncher.svg" width="180">
+</p>
+
+<h1 align="center">Velix Launcher</h1>
 
 <p align="center">
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="/program_info/ru.pineconemc.launcher.logo-darkmode.svg">
-  <source media="(prefers-color-scheme: light)" srcset="/program_info/ru.pineconemc.launcher.logo.svg">
-  <img alt="ru.pineconemc.launcher" src="/program_info/ru.pineconemc.launcher.logo.svg" width="40%">
-</picture>
+  <b>Сучасний та швидкий лаунчер для Minecraft з інтеграцією MineStrator API та підтримкою Ely.by акаунтів.</b>
 </p>
 
 <p align="center">
-  This <b>fork</b> of Prism Launcher adds integrated support for Ely.by accounts (MSA accounts can still be used)<br />
-  <br />This is <b>not</b> endorsed by Prism Launcher or Ely.by.
+  <i>Цей лаунчер розроблений на PineconeMC.</i>
 </p>
 
-## Why this fork?
+<p align="center">
+  <a href="https://github.com/vekstr3-a11y/Velix-Launcher/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/vekstr3-a11y/Velix-Launcher/build.yml?branch=main&label=Build" alt="Build Status">
+  </a>
+  <a href="https://github.com/vekstr3-a11y/Velix-Launcher/releases">
+    <img src="https://img.shields.io/github/v/release/vekstr3-a11y/Velix-Launcher?include_prereleases&label=Release" alt="Latest Release">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/github/license/vekstr3-a11y/Velix-Launcher?label=License" alt="License">
+  </a>
+</p>
 
-There are already quite a few forks out in the wild that add Ely.by support and/or disable the Microsoft account requirement. This fork goes beyond simply adding a login-password prompt and authlib-injector download.
+---
 
-- Modern and secure login: PineconeMC uses OAuth2 to log you in. This means that your credentials are never transferred to the launcher. Instead, you log into your account on the official Ely.by page in the browser, and Ely.by gives the launcher a token to access your account with limited privileges.
-- Skins support on servers: All other forks rely exclusively on authlib-injector to patch Minecraft to support Ely.by. But authlib-injector can't provide skins on servers that don't have a special skins plugin installed. PineconeMC uses Ely.by's official Authlib patches, allowing you to see skins anywhere
+## ⚡ Особливості Velix Launcher
 
-## Installation
+- **Паралельний запуск сервера MineStrator**:
+  - Натискаєте кнопку **«ЗАПУСК СВОГО СЕРВЕРА»** — команда на запуск сервера миттєво відправляється через MineStrator API, а Minecraft запускається паралельно з автоматичним підключенням до вашого сервера.
+  - Жодного очікування — поки завантажується гра, сервер піднімається у фоні.
+- **Підтримка облікових записів**:
+  - Безпечна авторизація Ely.by через OAuth2.
+  - Підтримка офіційних Microsoft акаунтів.
+  - Повна підтримка скінів.
+- **Гнучкі режими запуску**:
+  - **ЗАПУСК СВОГО СЕРВЕРА**: MineStrator API + автопідключення.
+  - **ЗАПУСТИТИ MINECRAFT**: чистий запуск без сервера.
+  - **ЗАЙТИ НА СЕРВЕР**: прямий вхід на будь-який введений IP або домен.
+- **Адаптивний дизайн та локалізація**:
+  - Автоматичне підлаштування під будь-яку тему оформлення (Dark, Light, Catppuccin тощо).
+  - Підтримка мов інтерфейсу: українська, англійська, польська, німецька та інші.
 
-- All downloads and instructions for PineconeMC can be found on the [Releases](https://github.com/ElyPrismLauncher/Launcher/releases/latest) page.
-- Last build status can be found in the [GitHub Actions](https://github.com/ElyPrismLauncher/Launcher/actions) tab.
+---
 
-### Development Builds
+## 📥 Завантаження та встановлення
 
-Please understand that these builds are not intended for most users. There may be bugs, and other instabilities. You have been warned.
+Готові збірки для Windows доступні у вкладках:
+- **[Releases](https://github.com/vekstr3-a11y/Velix-Launcher/releases)** — релізні версії (інсталятор `Velix-Setup.exe` та Portable-версія).
+- **[GitHub Actions](https://github.com/vekstr3-a11y/Velix-Launcher/actions)** — свіжі автоматичні збірки з гілки `main`.
 
-There are development builds available through:
+---
 
-- [GitHub Actions](https://github.com/ElyPrismLauncher/Launcher/actions) (includes builds from pull requests opened by contributors)
-- [nightly.link](https://nightly.link/ElyPrismLauncher/Launcher/workflows/build/develop) (this will always point only to the latest version of develop)
+## ⚙️ Налаштування MineStrator API
 
-These have debug information in the binaries, so their file sizes are relatively larger.
+1. Відкрийте панель управління [MineStrator](https://panel.minestrator.com).
+2. Перейдіть до налаштувань вашого облікового запису та згенеруйте **API-ключ**.
+3. Дізнайтеся **ID вашого сервера** у панелі.
+4. Введіть API-ключ та Server ID безпосередньо у вікні запуску Velix Launcher (або в налаштуваннях: *Налаштування → API*).
+5. Натисніть **«ЗАПУСК СВОГО СЕРВЕРА»** — і грайте!
 
-## Community & Support
+---
 
-Feel free to create a GitHub issue if you find a bug or want to suggest a new feature. We have a Discord server where other community members can help you:
+## 📜 Ліцензія
 
-[![Octol1ttle's Studio Discord server](https://discordapp.com/api/guilds/1201522867901313045/widget.png?style=banner3)](https://discord.gg/5kcBCvnbTp)
-
-## Building
-
-If you want to build PineconeMC yourself, check the [build instructions](https://prismlauncher.org/wiki/development/build-instructions).
-
-## The following comes from the original Prism Launcher README
-
-### Forking/Redistributing/Custom builds policy
-
-You are free to fork, redistribute and provide custom builds as long as you follow the terms of the [license](LICENSE) (this is a legal responsibility), and if you made code changes rather than just packaging a custom build, please do the following as a basic courtesy:
-
-- Make it clear that your fork is not Prism Launcher and is not endorsed by or affiliated with the Prism Launcher project (<https://prismlauncher.org>).
-- Go through [CMakeLists.txt](CMakeLists.txt) and change Prism Launcher's API keys to your own or set them to empty strings (`""`) to disable them (this way the program will still compile but the functionality requiring those keys will be disabled).
-
-If you have any questions or want any clarification on the above conditions please make an issue and ask us.
-
-If you are just building Prism Launcher for your distribution, please make sure to set the `Launcher_BUILD_PLATFORM` to a slug representing your distribution. Examples are `archlinux`, `fedora` and `nixpkgs`.
-
-Note that if you build this software without removing the provided API keys in [CMakeLists.txt](CMakeLists.txt) you are accepting the following terms and conditions:
-
-- [Microsoft Identity Platform Terms of Use](https://docs.microsoft.com/en-us/legal/microsoft-identity-platform/terms-of-use)
-- [CurseForge 3rd Party API Terms and Conditions](https://support.curseforge.com/en/support/solutions/articles/9000207405-curse-forge-3rd-party-api-terms-and-conditions)
-
-If you do not agree with these terms and conditions, then remove the associated API keys from the [CMakeLists.txt](CMakeLists.txt) file by setting them to an empty string (`""`).
-
-### License [![https://github.com/PrismLauncher/PrismLauncher/blob/develop/LICENSE](https://img.shields.io/github/license/PrismLauncher/PrismLauncher?label=License&logo=gnu&color=C4282D)](LICENSE)
-
-All launcher code is available under the GPL-3.0-only license.
-
-The logo and related assets are under the CC BY-SA 4.0 license.
+Цей проєкт поширюється за ліцензією [GPL-3.0-only](LICENSE).
+Всі права на відповідні торгові марки належать їхнім правовласникам.
